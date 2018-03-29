@@ -61,3 +61,6 @@ cover/
 
 # Generated json files
 *.json
+
+.idea/
+.pytest_cache/
