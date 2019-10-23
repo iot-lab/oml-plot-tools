@@ -42,7 +42,7 @@ def get_version(package):
                 return eval(line.split('=')[-1])  # pylint:disable=eval-used
 
 
-SCRIPTS = ['plot_oml_consum', 'plot_oml_radio', 'plot_oml_traj']
+SCRIPTS = ['plot_oml_consum', 'plot_oml_radio', 'plot_oml_traj', 'iotlab-plot']
 
 INSTALL_REQUIRES = ['argparse', 'numpy', 'matplotlib', 'Pillow']
 INSTALL_REQUIRES += ['iotlabcli>=2.0.0']
