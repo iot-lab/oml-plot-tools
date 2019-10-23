@@ -47,6 +47,8 @@ plot:
 
 
 import argparse
+import sys
+
 import matplotlib.pyplot as plt
 from . import common
 
@@ -152,9 +154,11 @@ def oml_plot_rssi(data, title, separated=False):
         common.plot(cdata, _title, meas.name, meas.label)
 
 
-def main():
-    """ Main command """
-    opts = PARSER.parse_args()
+def main(args=None):
+    """ iotlab-plot radio command """
+    args = args or sys.argv[1:]
+
+    opts = PARSER.parse_args(args)
     # default to plot all
     selection = opts.plot or (_JOINED)
     # select samples

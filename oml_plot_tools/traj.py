@@ -50,6 +50,7 @@ plot:
 
 
 import json
+import sys
 from collections import namedtuple
 from cStringIO import StringIO
 
@@ -317,9 +318,11 @@ def _plot_robot_traj(robot_traj):
     plt.ylabel('Y (m)')
 
 
-def main():  # pylint:disable=too-many-statements
+def main(args=None):  # pylint:disable=too-many-statements
     """ Main command """
-    opts = PARSER.parse_args()
+    args = args or sys.argv[1:]
+
+    opts = PARSER.parse_args(args)
     # default to plot traj/map
     selection = opts.plot or ('traj')
     # select samples
