@@ -215,7 +215,7 @@ def trajectory_plot(data, title, mapinfo, circuit, selection):
     if plot_data:
         common.plot_show()
     else:
-        print "Nothing to plot"
+        print("Nothing to plot")
 
 
 def oml_plot_angle(data, title, xlabel=common.TIMESTAMP_LABEL):
