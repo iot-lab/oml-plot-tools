@@ -25,12 +25,9 @@
 # Issues with numpy
 # pylint:disable=no-member
 
-from collections import namedtuple
-try:
-    # E0611: no name in module
-    from collections import OrderedDict  # pylint:disable=import-error,E0611
-except ImportError:  # pragma: no cover
-    from ordereddict import OrderedDict  # pylint:disable=import-error
+from __future__ import print_function
+
+from collections import namedtuple, OrderedDict
 
 import numpy
 import matplotlib.pyplot as plt

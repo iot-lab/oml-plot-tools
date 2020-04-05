@@ -23,7 +23,13 @@
 # pylint:disable=missing-docstring
 
 import unittest
-from cStringIO import StringIO
+
+try:
+    # pylint:disable=unused-import
+    from cStringIO import StringIO  # noqa
+except ImportError:  # Python 3
+    # pylint:disable=unused-import
+    from io import StringIO  # noqa
 
 # Issues with pylint and numpy
 # pylint:disable=no-member
