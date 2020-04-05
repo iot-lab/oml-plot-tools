@@ -69,7 +69,7 @@ class TestTrajectoryOmlPlot(unittest.TestCase):
     def test_plot_all(self):
         ref_img = test_file_path('examples', 'trajectory_all.png')
         traj.oml_plot_map(self.data, self.title, self.mapinfo, self.circuit)
-        utest_plot_and_compare(self, ref_img, 250)
+        utest_plot_and_compare(self, ref_img, 600)
 
     def test_plot_traj_only(self):
         ref_img = test_file_path('examples', 'trajectory_only.png')
@@ -79,7 +79,7 @@ class TestTrajectoryOmlPlot(unittest.TestCase):
     def test_plot_traj_circuit(self):
         ref_img = test_file_path('examples', 'trajectory_circuit.png')
         traj.oml_plot_map(None, self.title, None, self.circuit)
-        utest_plot_and_compare(self, ref_img, 50)
+        utest_plot_and_compare(self, ref_img, 60)
 
     def test_plot_traj_nothing(self):
         ret = traj.oml_plot_map(None, None, None, None)
