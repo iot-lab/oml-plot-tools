@@ -302,7 +302,7 @@ def _plot_circuit(circuit):
     coords = (coords_x, coords_y)
 
     # Get edges between checkpoints
-    edges = patches.Polygon(zip(*coords), **CIRCUIT_EDGE_PLT)
+    edges = patches.Polygon(list(zip(*coords)), **CIRCUIT_EDGE_PLT)
 
     # Plot
     a_x = plt.gcf().add_subplot(111)
