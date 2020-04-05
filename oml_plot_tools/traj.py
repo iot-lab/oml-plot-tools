@@ -52,10 +52,11 @@ from __future__ import print_function
 
 import json
 import sys
-from collections import namedtuple
-from cStringIO import StringIO
 
 import argparse
+
+from collections import namedtuple
+from io import BytesIO
 
 # Issues with numpy and matplotlib.cm
 # pylint:disable=no-member
@@ -131,7 +132,7 @@ def _mapinfo_from_cfg(map_cfg):
     """ MapInfo object from 'map_cfg' dict """
 
     # Load Image
-    image_fd = StringIO(map_cfg['image'])
+    image_fd = BytesIO(map_cfg['image'])
     image = Image.open(image_fd).convert('L')
 
     # Load Docks

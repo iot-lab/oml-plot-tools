@@ -27,7 +27,13 @@ from __future__ import print_function
 import os
 import math
 import runpy
-from cStringIO import StringIO
+
+try:
+    # pylint:disable=unused-import
+    from cStringIO import StringIO  # noqa
+except ImportError:  # Python 3
+    # pylint:disable=unused-import
+    from io import StringIO  # noqa
 
 import mock
 import matplotlib.pyplot as plt
