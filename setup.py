@@ -20,7 +20,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-import sys
 import os
 from setuptools import setup, find_packages
 
@@ -47,9 +46,6 @@ SCRIPTS = ['plot_oml_consum', 'plot_oml_radio', 'plot_oml_traj']
 
 INSTALL_REQUIRES = ['argparse', 'numpy', 'matplotlib', 'Pillow']
 INSTALL_REQUIRES += ['iotlabcli>=2.0.0']
-if sys.version_info[0:2] == (2, 6):
-    # OrderedDict added in python2.7
-    INSTALL_REQUIRES.append('ordereddict')
 
 
 setup(
