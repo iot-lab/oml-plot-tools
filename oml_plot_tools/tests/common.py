@@ -126,10 +126,6 @@ def assert_called_with_nparray(mock_function, np_array, *args, **kwargs):
     call_array = call_args[0]
     call_args = call_args[1:]
 
-    # Failed to compare with '==', 'np.array_equal', or 'np.allclose'
-    got = call_array, call_args, call_kwargs
-    expected = np_array, args, kwargs
-    assert_string = '%s == %s' % (got, expected)
-
-    assert (repr(call_array), call_args, call_kwargs) == \
-        (repr(np_array), args, kwargs), assert_string
+    assert repr(call_array) == repr(np_array)
+    assert repr(call_args) == repr(args)
+    assert call_kwargs == kwargs

@@ -109,18 +109,14 @@ class TestConsumptionPlot(unittest.TestCase):
         assert_called_with_nparray(
             self.oml_plot,
             self.data, self.title,
-            [common.MeasureTuple('power', float, 'Power (W)'),
-             common.MeasureTuple('voltage', float, 'Voltage (V)'),
-             common.MeasureTuple('current', float, 'Current (A)')])
+            consum.MEASURES_D.values())
 
     def test_plot_default_all(self):
         self.consum_main()
         assert_called_with_nparray(
             self.oml_plot,
             self.data, self.title,
-            [common.MeasureTuple('power', float, 'Power (W)'),
-             common.MeasureTuple('voltage', float, 'Voltage (V)'),
-             common.MeasureTuple('current', float, 'Current (A)')])
+            consum.MEASURES_D.values())
 
     def test_plot_time(self):
         self.consum_main('-t')
