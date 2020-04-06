@@ -20,11 +20,12 @@
 # knowledge of the CeCILL license and that you accept its terms.
 
 """ Test the iotlabcli.experiment_parser module """
+
 import pytest
 
 import oml_plot_tools.main as main_parser
 
-from .c23 import patch
+from mock import patch
 
 
 @pytest.mark.parametrize('entry',
