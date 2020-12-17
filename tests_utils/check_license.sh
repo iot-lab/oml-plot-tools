@@ -21,6 +21,7 @@ files_list=$(echo "${files_list}" | grep -v \
     -e '.txt$' \
     -e 'codecov.yml' \
     -e 'README.rst' \
+    -e 'continuous-integration.yml' \
 )
 
 # Verify that 'AUTHORS' and 'COPYING' files exist

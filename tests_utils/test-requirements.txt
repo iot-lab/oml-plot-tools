@@ -1,8 +1,8 @@
 pytest
 pytest-cov
-pytest-pep8
 mock
 setuptools-lint
-# issues with pep8 >= 1.6
-flake8==2.3.0
+flake8
 codecov
+pycodestyle
+twine
