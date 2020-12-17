@@ -19,7 +19,6 @@ files_list=$(echo "${files_list}" | grep -v \
     -e '.png$' \
     -e '.json$' \
     -e '.txt$' \
-    -e '.travis.yml' \
     -e 'codecov.yml' \
     -e 'README.rst' \
 )
