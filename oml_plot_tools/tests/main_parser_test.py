@@ -23,9 +23,9 @@
 
 import pytest
 
-import oml_plot_tools.main as main_parser
-
 from mock import patch
+
+import oml_plot_tools.main as main_parser
 
 
 @pytest.mark.parametrize('entry',
