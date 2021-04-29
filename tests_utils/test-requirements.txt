@@ -1,7 +1,7 @@
 pytest
 pytest-cov
 mock
-setuptools-lint
+pylint
 flake8
 codecov
 pycodestyle
