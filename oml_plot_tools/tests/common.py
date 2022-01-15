@@ -22,8 +22,6 @@
 
 """ Common tests functions """
 
-from __future__ import print_function
-
 import os
 import math
 import runpy

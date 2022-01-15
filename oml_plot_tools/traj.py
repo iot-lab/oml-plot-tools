@@ -48,8 +48,6 @@ plot:
   -ti, --time           Plot time verification
 """
 
-from __future__ import print_function
-
 import json
 import sys
 

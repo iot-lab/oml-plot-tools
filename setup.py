@@ -73,7 +73,6 @@ setup(
     scripts=SCRIPTS,
     classifiers=['Development Status :: 3 - Alpha',
                  'Programming Language :: Python',
-                 'Programming Language :: Python :: 2',
                  'Programming Language :: Python :: 3',
                  'Intended Audience :: End Users/Desktop',
                  'Environment :: Console',
