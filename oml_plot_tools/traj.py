@@ -60,8 +60,8 @@ from io import BytesIO
 # pylint:disable=no-member
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.patches as patches
+from matplotlib import cm
+from matplotlib import patches
 # http://stackoverflow.com/a/26605247/395687
 # pip install --no-index -f http://dist.plone.org/thirdparty/ -U PIL
 # or 'apt-get install python-imaging'
@@ -72,7 +72,7 @@ import iotlabcli.robot
 from . import common
 
 
-PACKAGE = __name__.split('.')[0]
+PACKAGE = __name__.split('.', maxsplit=1)[0]
 
 DOCK_PLT = {
     'color': 'blue',
