@@ -104,8 +104,9 @@ def utest_plot_and_compare(testcase, ref_img, threshold=0.0):
     # Check files
     rms = compare_images(ref_img, tmp_img)
 
-    msg = '%s != %s: Root-mean-square == %f > %f' % (ref_img, tmp_img,
-                                                     rms, threshold)
+    msg = (
+        f'{ref_img} != {tmp_img}: Root-mean-square == {rms:f} > {threshold:f}'
+    )
     testcase.assertTrue(rms <= threshold, msg=msg)
 
     # Cleanup on success

@@ -68,11 +68,11 @@ def oml_load(filename, meas_type, measures):
     try:
         data = _oml_read(filename, meas_type, meas_dtypes)
     except IOError as err:
-        raise ValueError("Error opening oml file:\n{0}\n".format(err))
+        raise ValueError(f"Error opening oml file:\n{err}\n")
     except (ValueError, StopIteration, IndexError) as err:
-        raise ValueError("Error reading oml file:\n{0}\n".format(err))
+        raise ValueError(f"Error reading oml file:\n{err}\n")
     except TypeError as err:
-        raise ValueError("{0}".format(err))
+        raise ValueError(f"{err}")
 
     # No error when only one value
     data = numpy.atleast_1d(data)
@@ -92,7 +92,7 @@ def oml_plot_clock(data, title='Clock time verification'):
     time = data['timestamp']
     clock_diff = numpy.diff(time) * 1000
 
-    print('Time from %f to %f' % (time[0], time[-1]))
+    print(f'Time from {time[0]:f} to {time[-1]:f}')
     print('NB Points      =', len(time))
     print('Duration    (s)=', time[-1] - time[0])
     print('Steptime   (ms)=', 1000 * (time[-1] - time[0]) / len(time))
@@ -156,7 +156,7 @@ def _valid_oml_f(meas_type):
         value = int(value)
         if int(value) == OML_TYPES[meas_type]:
             return meas_type
-        raise TypeError("OML file is not: %s" % meas_type)
+        raise TypeError(f"OML file is not: {meas_type}")
     return _validate
 
 

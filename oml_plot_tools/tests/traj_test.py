@@ -38,13 +38,13 @@ def robot_get_map(site):
     """Simulate robot_get_map using examples files."""
     map_cfg = {}
 
-    with open(test_file_path('examples', '%s-iotlab.png' % site), 'rb') as _fd:
+    with open(test_file_path('examples', f'{site}-iotlab.png'), 'rb') as _fd:
         map_cfg['image'] = _fd.read()
 
-    with open(test_file_path('examples', '%s-mapconfig.json' % site)) as _fd:
+    with open(test_file_path('examples', f'{site}-mapconfig.json')) as _fd:
         map_cfg['config'] = json.load(_fd)
 
-    with open(test_file_path('examples', '%s-dockconfig.json' % site)) as _fd:
+    with open(test_file_path('examples', f'{site}-dockconfig.json')) as _fd:
         map_cfg['dock'] = json.load(_fd)
 
     return map_cfg

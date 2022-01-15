@@ -221,7 +221,7 @@ def trajectory_plot(data, title, mapinfo, circuit, selection):
 def oml_plot_angle(data, title, xlabel=common.TIMESTAMP_LABEL):
     """ Plot data 'angel' field """
     ylabel = MEASURES_D['theta'].label
-    title = '%s %s' % (title, 'angle')
+    title = f"{title} {'angle'}"
 
     plt.figure()
     plt.title(title)

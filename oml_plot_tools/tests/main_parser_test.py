@@ -32,6 +32,6 @@ import oml_plot_tools.main as main_parser
                          ['consum', 'radio', 'traj'])
 def test_main_parser(entry):
     """ Experiment parser """
-    with patch('oml_plot_tools.%s.main' % entry) as entrypoint_func:
+    with patch(f'oml_plot_tools.{entry}.main') as entrypoint_func:
         main_parser.main([entry, '-i', '123'])
         entrypoint_func.assert_called_with(['-i', '123'])

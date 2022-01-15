@@ -141,7 +141,7 @@ def oml_plot(data, title, meas_tuples):
     for num, meas in enumerate(meas_tuples, start=1):
         plt.subplot(nbplots, 1, num)
 
-        _title = '%s %s' % (title, meas.name)
+        _title = f'{title} {meas.name}'
         common.plot(data, _title, meas.name, meas.label)
 
 

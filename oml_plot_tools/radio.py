@@ -144,7 +144,7 @@ def oml_plot_rssi(data, title, separated=False):
     for num, channel in enumerate(channels, start=1):
         # Select data for channel
         cdata = with_channel(data, channel)
-        _title = '%s Channel %s' % (title, channel)
+        _title = f'{title} Channel {channel}'
 
         # One window per plot
         if separated:
