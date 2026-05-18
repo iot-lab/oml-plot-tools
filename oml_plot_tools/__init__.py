@@ -19,6 +19,6 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-""" List of tools to display iot-lab oml generated files """
+"""List of tools to display iot-lab oml generated files"""
 
-__version__ = '0.8.0'
+__version__ = "0.8.0"

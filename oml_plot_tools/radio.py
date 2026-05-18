@@ -27,71 +27,85 @@ usage: plot_oml_radio [-h] -i DATA [-l TITLE] [-b BEGIN] [-e END] [-a] [-p]
 
 Plot iot-lab radio OML files
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -i DATA, --input DATA
-                        Node radio values
-  -l TITLE, --label TITLE
-                        Graph title
-  -b BEGIN, --begin BEGIN
-                        Sample start
-  -e END, --end END     Sample end
+options:
+  -h, --help         show this help message and exit
+  -i, --input DATA   Node radio values
+  -l, --label TITLE  Graph title
+  -b, --begin BEGIN  Sample start
+  -e, --end END      Sample end
 
 plot:
   Plot selection
 
-  -a, --all             Plot all channels in one window (default)
-  -p, --plot            Plot channels in different windows
-  -t, --time            Plot time verification
+  -a, --all          Plot all channels in one window (default)
+  -p, --plot         Plot channels in different windows
+  -t, --time         Plot time verification
 """
-
 
 import argparse
 import sys
 
 import matplotlib.pyplot as plt
+
 from . import common
 
 MEASURES_D = common.measures_dict(
-    ('channel', int, 'Channel'),
-    ('rssi', int, 'RSSI (dBm)'),
+    ("channel", int, "Channel"),
+    ("rssi", int, "RSSI (dBm)"),
 )
 
 
 def oml_load(filename):
-    """ Load radio oml file """
-    data = common.oml_load(filename, 'radio', MEASURES_D.values())
+    """Load radio oml file"""
+    data = common.oml_load(filename, "radio", MEASURES_D.values())
     return data
 
 
 # Selection variables
-_JOINED = 'joined'
-_SEPARATED = 'separated'
-_TIME = 'time'
+_JOINED = "joined"
+_SEPARATED = "separated"
+_TIME = "time"
 
 
 PARSER = argparse.ArgumentParser(
-    prog='plot_oml_radio', description="Plot iot-lab radio OML files")
-PARSER.add_argument('-i', '--input', dest='data', type=oml_load, required=True,
-                    help="Node radio values")
-PARSER.add_argument('-l', '--label', dest='title', default="Node",
-                    help="Graph title")
-PARSER.add_argument('-b', '--begin', default=0, type=int, help="Sample start")
-PARSER.add_argument('-e', '--end', default=-1, type=int, help="Sample end")
+    prog="plot_oml_radio", description="Plot iot-lab radio OML files"
+)
+PARSER.add_argument(
+    "-i", "--input", dest="data", type=oml_load, required=True, help="Node radio values"
+)
+PARSER.add_argument("-l", "--label", dest="title", default="Node", help="Graph title")
+PARSER.add_argument("-b", "--begin", default=0, type=int, help="Sample start")
+PARSER.add_argument("-e", "--end", default=-1, type=int, help="Sample end")
 
-_PLOT = PARSER.add_argument_group('plot', "Plot selection")
-_PLOT.add_argument('-a', '--all', dest='plot', const=_JOINED,
-                   action='append_const',
-                   help="Plot all channels in one window (default)")
-_PLOT.add_argument('-p', '--plot', dest='plot', const=_SEPARATED,
-                   action='append_const',
-                   help="Plot channels in different windows")
-_PLOT.add_argument('-t', '--time', dest='plot', const=_TIME,
-                   action='append_const', help="Plot time verification")
+_PLOT = PARSER.add_argument_group("plot", "Plot selection")
+_PLOT.add_argument(
+    "-a",
+    "--all",
+    dest="plot",
+    const=_JOINED,
+    action="append_const",
+    help="Plot all channels in one window (default)",
+)
+_PLOT.add_argument(
+    "-p",
+    "--plot",
+    dest="plot",
+    const=_SEPARATED,
+    action="append_const",
+    help="Plot channels in different windows",
+)
+_PLOT.add_argument(
+    "-t",
+    "--time",
+    dest="plot",
+    const=_TIME,
+    action="append_const",
+    help="Plot time verification",
+)
 
 
 def radio_plot(data, title, selection):
-    """ Plot radio values according to selection
+    """Plot radio values according to selection
 
     :param data: numpy array returnel by oml_read
     :param title: Subplots title base
@@ -114,19 +128,19 @@ def radio_plot(data, title, selection):
 
 
 def list_channels(data):
-    """ List radio channels used in data """
-    channels = list(set(data['channel']))
+    """List radio channels used in data"""
+    channels = list(set(data["channel"]))
     return sorted(channels)
 
 
 def with_channel(data, channel):
-    """ Extract data where measured channel == `channel` """
-    select = data['channel'] == channel
+    """Extract data where measured channel == `channel`"""
+    select = data["channel"] == channel
     return data[select]
 
 
 def oml_plot_rssi(data, title, separated=False):
-    """ Plot rssi for all channels.
+    """Plot rssi for all channels.
 
     :param data: numpy array returned by oml_read
     :param title: Subplots title base
@@ -135,7 +149,7 @@ def oml_plot_rssi(data, title, separated=False):
 
     channels = list_channels(data)
     nbplots = len(channels)
-    meas = MEASURES_D['rssi']
+    meas = MEASURES_D["rssi"]
 
     # Only window for all
     if not separated:
@@ -144,7 +158,7 @@ def oml_plot_rssi(data, title, separated=False):
     for num, channel in enumerate(channels, start=1):
         # Select data for channel
         cdata = with_channel(data, channel)
-        _title = f'{title} Channel {channel}'
+        _title = f"{title} Channel {channel}"
 
         # One window per plot
         if separated:
@@ -155,14 +169,14 @@ def oml_plot_rssi(data, title, separated=False):
 
 
 def main(args=None):
-    """ iotlab-plot radio command """
+    """iotlab-plot radio command"""
     args = args or sys.argv[1:]
 
     opts = PARSER.parse_args(args)
     # default to plot all
     selection = opts.plot or (_JOINED)
     # select samples
-    data = opts.data[opts.begin:opts.end]
+    data = opts.data[opts.begin : opts.end]
     radio_plot(data, opts.title, selection)
 
 

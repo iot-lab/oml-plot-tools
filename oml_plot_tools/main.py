@@ -34,16 +34,15 @@ def main(args=None):
     args = args or sys.argv[1:]
 
     commands = {
-        'consum': oml_plot_tools.consum.main,
-        'radio': oml_plot_tools.radio.main,
-        'traj': oml_plot_tools.traj.main,
-        'help': None
+        "consum": oml_plot_tools.consum.main,
+        "radio": oml_plot_tools.radio.main,
+        "traj": oml_plot_tools.traj.main,
+        "help": None,
     }
 
     parser = ArgumentParser()
-    parser.add_argument('command', nargs='?',
-                        choices=commands.keys(), default='help')
-    commands['help'] = lambda args: parser.print_help()
+    parser.add_argument("command", nargs="?", choices=commands.keys(), default="help")
+    commands["help"] = lambda args: parser.print_help()
 
     opts, args = parser.parse_known_args(args)
 

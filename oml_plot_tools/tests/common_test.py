@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # This file is a part of IoT-LAB oml-plot-tools
 # Copyright (C) 2015 INRIA (Contact: admin@iot-lab.info)
@@ -19,86 +19,115 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-
-# pylint:disable=missing-docstring
+"""Tests for common.py."""
 
 import unittest
+from io import StringIO
 
-try:
-    # pylint:disable=unused-import
-    from cStringIO import StringIO  # noqa
-except ImportError:  # Python 3
-    # pylint:disable=unused-import
-    from io import StringIO  # noqa
-
-# Issues with pylint and numpy
-# pylint:disable=no-member
 import numpy
 
-from oml_plot_tools import common
-from oml_plot_tools import consum
+from oml_plot_tools import common, consum
 
-
-MEASURE_FMT = ('{t} {type} {num} {t_s} {t_us} {measures}\n')
-HEADER = 'HEADER\n' * common.OML_HEADER_LEN
-CONSO_T = common.OML_TYPES['consumption']
+MEASURE_FMT = "{t} {type} {num} {t_s} {t_us} {measures}\n"
+HEADER = "HEADER\n" * common.OML_HEADER_LEN
+CONSO_T = common.OML_TYPES["consumption"]
 
 
 class TestCommon(unittest.TestCase):
+    """Tests for common OML loading utilities."""
 
     def test_oml_load(self):
-
-        meas = '1. 2. 3.'
+        """Test loading valid OML data with two measurement entries."""
+        meas = "1. 2. 3."
         content = HEADER
-        content += MEASURE_FMT.format(t=0.1234, type=CONSO_T, num=1,
-                                      t_s=12345, t_us=678900, measures=meas)
-        content += MEASURE_FMT.format(t=1.1234, type=CONSO_T, num=2,
-                                      t_s=12346, t_us=678900, measures=meas)
+        content += MEASURE_FMT.format(
+            t=0.1234, type=CONSO_T, num=1, t_s=12345, t_us=678900, measures=meas
+        )
+        content += MEASURE_FMT.format(
+            t=1.1234, type=CONSO_T, num=2, t_s=12346, t_us=678900, measures=meas
+        )
 
-        ret = common.oml_load(StringIO(content), 'consumption',
-                              consum.MEASURES_D.values())
+        ret = common.oml_load(
+            StringIO(content), "consumption", consum.MEASURES_D.values()
+        )
 
-        expected = [(12345.6789, 'consumption', 1, 12345, 678900, 1., 2., 3.),
-                    (12346.6789, 'consumption', 2, 12346, 678900, 1., 2., 3.)]
+        expected = [
+            (12345.6789, "consumption", 1, 12345, 678900, 1.0, 2.0, 3.0),
+            (12346.6789, "consumption", 2, 12346, 678900, 1.0, 2.0, 3.0),
+        ]
         self.assertEqual(expected, ret.tolist())
         self.assertTrue(isinstance(ret, numpy.ndarray))
 
     def test_oml_load_only_one(self):
-        meas = '1. 2. 3.'
+        """Test loading valid OML data with a single measurement entry."""
+        meas = "1. 2. 3."
         content = HEADER
-        content += MEASURE_FMT.format(t=0.1234, type=CONSO_T, num=1,
-                                      t_s=12345, t_us=678900, measures=meas)
+        content += MEASURE_FMT.format(
+            t=0.1234, type=CONSO_T, num=1, t_s=12345, t_us=678900, measures=meas
+        )
 
-        ret = common.oml_load(StringIO(content), 'consumption',
-                              consum.MEASURES_D.values())
+        ret = common.oml_load(
+            StringIO(content), "consumption", consum.MEASURES_D.values()
+        )
 
-        expected = [(12345.6789, 'consumption', 1, 12345, 678900, 1., 2., 3.)]
+        expected = [(12345.6789, "consumption", 1, 12345, 678900, 1.0, 2.0, 3.0)]
         self.assertEqual(expected, ret.tolist())
         self.assertTrue(isinstance(ret, numpy.ndarray))
 
     def test_oml_invalid(self):
-
+        """Test that loading invalid or malformed OML data raises ValueError."""
         # invalid data
-        content = HEADER + 'invalid_content'
-        self.assertRaises(ValueError, common.oml_load,
-                          StringIO(content), 'consumption',
-                          consum.MEASURES_D.values())
+        content = HEADER + "invalid_content"
+        self.assertRaises(
+            ValueError,
+            common.oml_load,
+            StringIO(content),
+            "consumption",
+            consum.MEASURES_D.values(),
+        )
 
         # Unknown file path
-        self.assertRaises(ValueError, common.oml_load,
-                          '/invalid/file/path', 'consumption',
-                          consum.MEASURES_D.values())
+        self.assertRaises(
+            ValueError,
+            common.oml_load,
+            "/invalid/file/path",
+            "consumption",
+            consum.MEASURES_D.values(),
+        )
 
         # skip header fail
-        self.assertRaises(ValueError, common.oml_load,
-                          StringIO('1 2 3'), 'consumption',
-                          consum.MEASURES_D.values())
+        self.assertRaises(
+            ValueError,
+            common.oml_load,
+            StringIO("1 2 3"),
+            "consumption",
+            consum.MEASURES_D.values(),
+        )
 
         # invalid oml 'type' file
-        meas = '1. 2. 3.'
+        meas = "1. 2. 3."
         content = HEADER
-        content += MEASURE_FMT.format(t=0.1234, type=(CONSO_T + 1), num=1,
-                                      t_s=12345, t_us=678900, measures=meas)
-        self.assertRaises(ValueError, common.oml_load,
-                          StringIO(content), 'consumption',
-                          consum.MEASURES_D.values())
+        content += MEASURE_FMT.format(
+            t=0.1234, type=(CONSO_T + 1), num=1, t_s=12345, t_us=678900, measures=meas
+        )
+        self.assertRaises(
+            ValueError,
+            common.oml_load,
+            StringIO(content),
+            "consumption",
+            consum.MEASURES_D.values(),
+        )
+
+    def test_array_empty(self):
+        """Test the array_empty utility function."""
+        self.assertTrue(common.array_empty(None))
+        self.assertTrue(common.array_empty([]))
+        self.assertFalse(common.array_empty([1, 2, 3]))
+
+    def test_measures_dict(self):
+        """Test the measures_dict utility function."""
+        d = common.measures_dict(("power", float, "Power (W)"))
+        self.assertIn("power", d)
+        self.assertEqual(d["power"].name, "power")
+        self.assertEqual(d["power"].type, float)
+        self.assertEqual(d["power"].label, "Power (W)")

@@ -1,8 +1,6 @@
+isort
+pylint
 pytest
 pytest-cov
-mock
-pylint
-flake8
-codecov
-pycodestyle
-twine
+ruff
+Pillow
