@@ -27,18 +27,15 @@ usage: plot_oml_traj [-h] [-i DATA] [--circuit-file CIRCUIT] [--site-map SITE]
 
 Plot iot-lab trajectory oml files
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
-  -i DATA, --input DATA
-                        Robot trajectory values
+  -i, --input DATA      Robot trajectory values
   --circuit-file CIRCUIT
                         Robot circuit file, '-' for stdin
   --site-map SITE       Site map
-  -l TITLE, --label TITLE
-                        Graph title
-  -b BEGIN, --begin BEGIN
-                        Sample start
-  -e END, --end END     Sample end
+  -l, --label TITLE     Graph title
+  -b, --begin BEGIN     Sample start
+  -e, --end END         Sample end
 
 plot:
   Plot selection
@@ -46,79 +43,76 @@ plot:
   -t, --traj            Plot robot trajectory
   -a, --angle           Plot robot angle
   -ti, --time           Plot time verification
-"""
-
-import json
-import sys
+"""  # noqa: E501, #pylint: disable=line-too-long
 
 import argparse
-
+import json
+import sys
 from collections import namedtuple
 from io import BytesIO
+
+import iotlabcli.robot
+import matplotlib.pyplot as plt
 
 # Issues with numpy and matplotlib.cm
 # pylint:disable=no-member
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib import patches
+from matplotlib import cm, patches
+
 # http://stackoverflow.com/a/26605247/395687
 # pip install --no-index -f http://dist.plone.org/thirdparty/ -U PIL
 # or 'apt-get install python-imaging'
 from PIL import Image
 
-import iotlabcli.robot
-
 from . import common
 
-
-PACKAGE = __name__.split('.', maxsplit=1)[0]
+PACKAGE = __name__.split(".", maxsplit=1)[0]
 
 DOCK_PLT = {
-    'color': 'blue',
-    'marker': 's',
-    's': 10,
+    "color": "blue",
+    "marker": "s",
+    "s": 10,
 }
 CIRCUIT_EDGE_PLT = {
-    'linestyle': 'dashed',
-    'linewidth': 2,
-    'edgecolor': 'red',
-    'fill': False,
+    "linestyle": "dashed",
+    "linewidth": 2,
+    "edgecolor": "red",
+    "fill": False,
 }
 CIRCUIT_POINT_PLT = {
-    'marker': 'o',
-    'color': 'red',
+    "marker": "o",
+    "color": "red",
 }
 
 MEASURES_D = common.measures_dict(
-    ('x', float, 'X'),
-    ('y', float, 'Y'),
-    ('theta', float, 'yaw angle (rad)'),
+    ("x", float, "X"),
+    ("y", float, "Y"),
+    ("theta", float, "yaw angle (rad)"),
 )
 
-Deco = namedtuple('Deco', ['marker', 'color', 'size', 'x', 'y'])
-Map = namedtuple('Map', ['marker', 'file', 'ratio', 'sizex', 'sizey',
-                         'offsetx', 'offsety'])
+Deco = namedtuple("Deco", ["marker", "color", "size", "x", "y"])
+Map = namedtuple(
+    "Map", ["marker", "file", "ratio", "sizex", "sizey", "offsetx", "offsety"]
+)
 
-MapInfo = namedtuple('MapInfo', ['image', 'ratio', 'offsetx', 'offsety',
-                                 'docks'])
-Dock = namedtuple('Dock', ['x', 'y', 'theta'])
+MapInfo = namedtuple("MapInfo", ["image", "ratio", "offsetx", "offsety", "docks"])
+Dock = namedtuple("Dock", ["x", "y", "theta"])
 
 # Selection variables
-_TITLE = 'Robot'
-_TRAJ = 'traj'
-_ANGLE = 'angle'
-_TIME = 'time'
+_TITLE = "Robot"
+_TRAJ = "traj"
+_ANGLE = "angle"
+_TIME = "time"
 
 
 def oml_load(filename):
-    """ Load consumption oml file """
-    data = common.oml_load(filename, 'robot_pose', MEASURES_D.values())
+    """Load consumption oml file"""
+    data = common.oml_load(filename, "robot_pose", MEASURES_D.values())
     return data
 
 
 def get_site_map(site):
-    """ Load infos for site """
+    """Load infos for site"""
     # Get map config and with cache
     map_cfg = iotlabcli.robot.robot_get_map(site)
     map_info = _mapinfo_from_cfg(map_cfg)
@@ -127,25 +121,24 @@ def get_site_map(site):
 
 
 def _mapinfo_from_cfg(map_cfg):
-    """ MapInfo object from 'map_cfg' dict """
+    """MapInfo object from 'map_cfg' dict"""
 
     # Load Image
-    image_fd = BytesIO(map_cfg['image'])
-    image = Image.open(image_fd).convert('L')
+    image_fd = BytesIO(map_cfg["image"])
+    image = Image.open(image_fd).convert("L")
 
     # Load Docks
-    docks = map_cfg['dock'].values()
-    docks = [Dock(d['x'], d['y'], d['theta']) for d in docks]
+    docks = map_cfg["dock"].values()
+    docks = [Dock(d["x"], d["y"], d["theta"]) for d in docks]
 
     # Create the whole MapInfo
-    cfg = map_cfg['config']
-    map_info = MapInfo(image, cfg['ratio'], cfg['offset'][0], cfg['offset'][1],
-                       docks)
+    cfg = map_cfg["config"]
+    map_info = MapInfo(image, cfg["ratio"], cfg["offset"][0], cfg["offset"][1], docks)
     return map_info
 
 
 def circuit_load(filename):
-    """ Load robot circuit file
+    """Load robot circuit file
 
     :returns: circuit json object
     {
@@ -169,35 +162,59 @@ def circuit_load(filename):
     }
     """
     # Handle '-' for stdin
-    json_file = argparse.FileType('r')(filename)
+    json_file = argparse.FileType("r")(filename)  # pylint: disable=deprecated-class
     return json.load(json_file)
 
 
 PARSER = argparse.ArgumentParser(
-    prog='plot_oml_traj', description="Plot iot-lab trajectory oml files")
-PARSER.add_argument('-i', '--input', dest='data', type=oml_load,
-                    help="Robot trajectory values")
-PARSER.add_argument('--circuit-file', dest='circuit', type=circuit_load,
-                    help="Robot circuit file, '-' for stdin")
-PARSER.add_argument('--site-map', metavar='SITE', dest='mapinfo',
-                    type=get_site_map, help="Site map")
+    prog="plot_oml_traj", description="Plot iot-lab trajectory oml files"
+)
+PARSER.add_argument(
+    "-i", "--input", dest="data", type=oml_load, help="Robot trajectory values"
+)
+PARSER.add_argument(
+    "--circuit-file",
+    dest="circuit",
+    type=circuit_load,
+    help="Robot circuit file, '-' for stdin",
+)
+PARSER.add_argument(
+    "--site-map", metavar="SITE", dest="mapinfo", type=get_site_map, help="Site map"
+)
 
-PARSER.add_argument('-l', '--label', dest='title', default=_TITLE,
-                    help="Graph title")
-PARSER.add_argument('-b', '--begin', default=0, type=int, help="Sample start")
-PARSER.add_argument('-e', '--end', default=-1, type=int, help="Sample end")
+PARSER.add_argument("-l", "--label", dest="title", default=_TITLE, help="Graph title")
+PARSER.add_argument("-b", "--begin", default=0, type=int, help="Sample start")
+PARSER.add_argument("-e", "--end", default=-1, type=int, help="Sample end")
 
-_PLOT = PARSER.add_argument_group('plot', "Plot selection")
-_PLOT.add_argument('-t', '--traj', dest='plot', const=_TRAJ,
-                   action='append_const', help="Plot robot trajectory")
-_PLOT.add_argument('-a', '--angle', dest='plot', const=_ANGLE,
-                   action='append_const', help="Plot robot angle")
-_PLOT.add_argument('-ti', '--time', dest='plot', const=_TIME,
-                   action='append_const', help="Plot time verification")
+_PLOT = PARSER.add_argument_group("plot", "Plot selection")
+_PLOT.add_argument(
+    "-t",
+    "--traj",
+    dest="plot",
+    const=_TRAJ,
+    action="append_const",
+    help="Plot robot trajectory",
+)
+_PLOT.add_argument(
+    "-a",
+    "--angle",
+    dest="plot",
+    const=_ANGLE,
+    action="append_const",
+    help="Plot robot angle",
+)
+_PLOT.add_argument(
+    "-ti",
+    "--time",
+    dest="plot",
+    const=_TIME,
+    action="append_const",
+    help="Plot time verification",
+)
 
 
 def trajectory_plot(data, title, mapinfo, circuit, selection):
-    """ Plot trajectories infos """
+    """Plot trajectories infos"""
 
     plot_data = False
 
@@ -219,22 +236,22 @@ def trajectory_plot(data, title, mapinfo, circuit, selection):
 
 
 def oml_plot_angle(data, title, xlabel=common.TIMESTAMP_LABEL):
-    """ Plot data 'angel' field """
-    ylabel = MEASURES_D['theta'].label
+    """Plot data 'angel' field"""
+    ylabel = MEASURES_D["theta"].label
     title = f"{title} {'angle'}"
 
     plt.figure()
     plt.title(title)
     plt.grid()
-    plt.plot(data['timestamp'], data['theta'])
+    plt.plot(data["timestamp"], data["theta"])
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     return True
 
 
 def _image_extent(mapinfo):
-    """ Image 'imshow' extent values
-    Place image in the robot coordinates """
+    """Image 'imshow' extent values
+    Place image in the robot coordinates"""
     left = mapinfo.offsetx
     right = mapinfo.offsetx + mapinfo.image.size[0] * mapinfo.ratio
 
@@ -245,7 +262,7 @@ def _image_extent(mapinfo):
 
 
 def oml_plot_map(data, title, mapinfo, circuit=None):
-    """ Plot iot-lab oml data
+    """Plot iot-lab oml data
 
     :param data: numpy array with robot trajectory
     :param title: plot title
@@ -258,9 +275,9 @@ def oml_plot_map(data, title, mapinfo, circuit=None):
 
     # Figure trajectory initialization
     plt.figure()
-    plt.title(title + ' trajectory')
+    plt.title(title + " trajectory")
     plt.grid()
-    plt.axes().set_aspect('equal', 'datalim')
+    plt.axes().set_aspect("equal", "datalim")
 
     # Map and dock background
     _plot_mapinfo(mapinfo)
@@ -273,14 +290,14 @@ def oml_plot_map(data, title, mapinfo, circuit=None):
 
 
 def _plot_mapinfo(mapinfo):
-    """ Plot map and docks background """
+    """Plot map and docks background"""
     if mapinfo is None:
         return
 
     # Plot map image in background
     extent = _image_extent(mapinfo)
     arr = np.asarray(mapinfo.image)
-    plt.imshow(arr, cmap=cm.Greys_r, aspect='equal', extent=extent)
+    plt.imshow(arr, cmap=cm.Greys_r, aspect="equal", extent=extent)
 
     # Plot docks
     for dock in mapinfo.docks:
@@ -288,15 +305,15 @@ def _plot_mapinfo(mapinfo):
 
 
 def _plot_circuit(circuit):
-    """ Plot circuit, scaled to map if available"""
+    """Plot circuit, scaled to map if available"""
     if circuit is None:
         return
 
-    coords = [circuit['coordinates'][p] for p in circuit['points']]
+    coords = [circuit["coordinates"][p] for p in circuit["points"]]
 
     # Get coordinates
-    coords_x = [c['x'] for c in coords]
-    coords_y = [c['y'] for c in coords]
+    coords_x = [c["x"] for c in coords]
+    coords_y = [c["y"] for c in coords]
     coords = (coords_x, coords_y)
 
     # Get edges between checkpoints
@@ -309,24 +326,24 @@ def _plot_circuit(circuit):
 
 
 def _plot_robot_traj(robot_traj):
-    """ Plot robot trajectory """
+    """Plot robot trajectory"""
     if robot_traj is None:
         return
 
-    plt.plot(robot_traj['x'], robot_traj['y'])
-    plt.xlabel('X (m)')
-    plt.ylabel('Y (m)')
+    plt.plot(robot_traj["x"], robot_traj["y"])
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
 
 
 def main(args=None):  # pylint:disable=too-many-statements
-    """ Main command """
+    """Main command"""
     args = args or sys.argv[1:]
 
     opts = PARSER.parse_args(args)
     # default to plot traj/map
-    selection = opts.plot or ('traj')
+    selection = opts.plot or ("traj")
     # select samples
-    data = opts.data[opts.begin:opts.end] if opts.data is not None else None
+    data = opts.data[opts.begin : opts.end] if opts.data is not None else None
 
     trajectory_plot(data, opts.title, opts.mapinfo, opts.circuit, selection)
 

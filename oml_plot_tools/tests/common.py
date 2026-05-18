@@ -20,46 +20,42 @@
 # knowledge of the CeCILL license and that you accept its terms.
 
 
-""" Common tests functions """
+"""Common tests functions."""
 
-import os
 import math
+import os
 import runpy
+import sys
+from io import StringIO
+from unittest import mock
 
-try:
-    # pylint:disable=unused-import
-    from cStringIO import StringIO  # noqa
-except ImportError:  # Python 3
-    # pylint:disable=unused-import
-    from io import StringIO  # noqa
-
-import mock
 import matplotlib.pyplot as plt
 from PIL import Image
 
 TEST_DIR = os.path.dirname(__file__)
+IS_PYTHON_3_10 = (3, 10) == tuple(map(int, sys.version.split()[0].split(".")))[:2]
 
 
-def test_file_path(*args):
-    """ Test file path """
+def fixture_path(*args):
+    """Test file path."""
     return os.path.join(TEST_DIR, *args)
 
 
-def help_main_and_doc(module, help_opt='--help'):
-    """ Check that help message is module docstring """
-
-    if not hasattr(module, 'main'):
+def help_main_and_doc(module, help_opt="--help"):
+    """Check that help message is module docstring."""
+    if not hasattr(module, "main"):
         return None, None  # pragma: no cover
 
     help_args = [module.__name__, help_opt]
     out_msg = StringIO()
 
-    with mock.patch('sys.argv', help_args):
-        with mock.patch('sys.stderr', out_msg):
-            with mock.patch('sys.stdout', out_msg):
+    with mock.patch("sys.argv", help_args):
+        with mock.patch("sys.stderr", out_msg):
+            with mock.patch("sys.stdout", out_msg):
                 try:
-                    runpy.run_module(module.__name__,
-                                     run_name='__main__', alter_sys=True)
+                    runpy.run_module(
+                        module.__name__, run_name="__main__", alter_sys=True
+                    )
                 except SystemExit:
                     pass
 
@@ -72,44 +68,39 @@ def help_main_and_doc(module, help_opt='--help'):
 
 
 def utest_help_as_doc(testcase_instance, module, *args, **kwargs):
-    """ Run help_as_doc as unittest test """
+    """Run help_as_doc as unittest test."""
     help_msg, help_doc = help_main_and_doc(module, *args, **kwargs)
     testcase_instance.assertEqual(help_msg, help_doc)
 
 
 def compare_images(ref_img, tmp_img):
-    """ Compare two images using PIL:
-    :returns: root-mean-square of the two images
+    """Compare two images using PIL.
 
-    # http://stackoverflow.com/a/1927681/395687 """
+    :returns: root-mean-square of the two images
+    """
     ref_h = Image.open(ref_img).histogram()
     tmp_h = Image.open(tmp_img).histogram()
-    rms = math.sqrt(sum((a-b)**2 for a, b in zip(ref_h, tmp_h))/len(ref_h))
+    rms = math.sqrt(sum((a - b) ** 2 for a, b in zip(ref_h, tmp_h)) / len(ref_h))
     return rms
 
 
 def utest_plot_and_compare(testcase, ref_img, threshold=0.0):
-    """ Plot image and compare files.
-    Keep file if they differ
+    """Plot image and compare files.
 
+    Keep file if they differ.
     'savefig' is not determinist between hosts so allow some differences with
-    threshold. Threshold choosen for png generated on Gaëtan computer
-    and errors found on ci server.
+    threshold.
     """
-    tmp_img = os.path.join('/tmp', os.path.basename(ref_img))
+    tmp_img = os.path.join("/tmp", os.path.basename(ref_img))
 
     plt.tight_layout()
     plt.savefig(tmp_img)
 
-    # Check files
     rms = compare_images(ref_img, tmp_img)
 
-    msg = (
-        f'{ref_img} != {tmp_img}: Root-mean-square == {rms:f} > {threshold:f}'
-    )
+    msg = f"{ref_img} != {tmp_img}: Root-mean-square == {rms:f} > {threshold:f}"
     testcase.assertTrue(rms <= threshold, msg=msg)
 
-    # Cleanup on success
     os.remove(tmp_img)
 
 

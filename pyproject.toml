@@ -1,0 +1,69 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "oml_plot_tools"
+version = "0.8.0"
+description = "IoT-LAB OML plot tools"
+readme = "README.rst"
+license = {text = "CeCILL v2.1"}
+authors = [{name = "IoT-LAB Team", email = "admin@iot-lab.info"}]
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: End Users/Desktop",
+    "Environment :: Console",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "Pillow",
+    "iotlabcli>=2.0.0",
+]
+
+[project.urls]
+Homepage = "http://www.iot-lab.info"
+"Download URL" = "http://github.com/iot-lab/oml-plot-tools/"
+
+[project.scripts]
+plot_oml_consum = "oml_plot_tools.consum:main"
+plot_oml_radio = "oml_plot_tools.radio:main"
+plot_oml_traj = "oml_plot_tools.traj:main"
+iotlab-plot = "oml_plot_tools.main:main"
+
+[tool.setuptools.packages.find]
+include = ["oml_plot_tools*"]
+
+[tool.pytest.ini_options]
+addopts = [
+    "-vv",
+    "--doctest-modules",
+    "--cov=oml_plot_tools",
+    "--cov-report=term-missing",
+    "--cov-report=term",
+    "--cov-report=xml",
+]
+testpaths = ["oml_plot_tools"]
+
+[tool.pylint."messages control"]
+disable = ["bad-option-value", "duplicate-code", "raise-missing-from", "unspecified-encoding"]
+
+[tool.pylint.reports]
+reports = false
+msg-template = "{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
+
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.isort]
+profile = "black"
+
+[tool.coverage.run]
+source = ["oml_plot_tools"]

@@ -20,48 +20,48 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-""" Common functions for all oml types """
+"""Common functions for all oml types"""
 
 # Issues with numpy
 # pylint:disable=no-member
 
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 
-import numpy
 import matplotlib.pyplot as plt
+import numpy
 
 OML_HEADER_LEN = 9
 
 OML_TYPES = {
-    'consumption': 1,
-    'radio': 2,
-    'event': 3,
-    'sniffer': 4,
-    'robot_pose': 10,
+    "consumption": 1,
+    "radio": 2,
+    "event": 3,
+    "sniffer": 4,
+    "robot_pose": 10,
 }
 
-TIMESTAMP_LABEL = 'Sample Time (sec)'
+TIMESTAMP_LABEL = "Sample Time (sec)"
 OML_FIELDS = [
-    ('timestamp', float),
-    ('type', numpy.str_, 16),
-    ('num', int),
-    ('t_s', int),
-    ('t_us', int),
+    ("timestamp", float),
+    ("type", numpy.str_, 16),
+    ("num", int),
+    ("t_s", int),
+    ("t_us", int),
 ]
 
-MeasureTuple = namedtuple('MeasureTuple', ['name', 'type', 'label'])
+MeasureTuple = namedtuple("MeasureTuple", ["name", "type", "label"])
 
 
 def measures_dict(*measures_tuples):
-    """ Create a dict of 'MeasuresTuple' with given measures """
+    """Create a dict of 'MeasuresTuple' with given measures"""
     measures_list = [(m[0], MeasureTuple(*m)) for m in measures_tuples]
     return OrderedDict(measures_list)
 
 
 def oml_load(filename, meas_type, measures):
-    """ Load oml file
+    """Load oml file
     :returns: numpy array
-    :measures: list of MeasureTuple """
+    :measures: list of MeasureTuple"""
 
     meas_dtypes = [(m.name, m.type) for m in measures]
 
@@ -85,21 +85,21 @@ def oml_load(filename, meas_type, measures):
     return data
 
 
-def oml_plot_clock(data, title='Clock time verification'):
-    """ Print clock diff between measures
+def oml_plot_clock(data, title="Clock time verification"):
+    """Print clock diff between measures
     :params data: oml_load returned array
     """
-    time = data['timestamp']
+    time = data["timestamp"]
     clock_diff = numpy.diff(time) * 1000
 
-    print(f'Time from {time[0]:f} to {time[-1]:f}')
-    print('NB Points      =', len(time))
-    print('Duration    (s)=', time[-1] - time[0])
-    print('Steptime   (ms)=', 1000 * (time[-1] - time[0]) / len(time))
-    print('Clock mean (ms)=', numpy.mean(clock_diff))
-    print('Clock std  (ms)=', numpy.std(clock_diff))
-    print('Clock max  (ms)=', numpy.max(clock_diff))
-    print('Clock min  (ms)=', numpy.min(clock_diff))
+    print(f"Time from {time[0]:f} to {time[-1]:f}")
+    print("NB Points      =", len(time))
+    print("Duration    (s)=", time[-1] - time[0])
+    print("Steptime   (ms)=", 1000 * (time[-1] - time[0]) / len(time))
+    print("Clock mean (ms)=", numpy.mean(clock_diff))
+    print("Clock std  (ms)=", numpy.std(clock_diff))
+    print("Clock max  (ms)=", numpy.max(clock_diff))
+    print("Clock min  (ms)=", numpy.min(clock_diff))
 
     plt.figure()
     plt.title(title)
@@ -110,12 +110,12 @@ def oml_plot_clock(data, title='Clock time verification'):
 
 
 def plot(data, title, field, ylabel, xlabel=TIMESTAMP_LABEL):
-    """ Plot data """
+    """Plot data"""
     plt.title(title)
     plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.plot(data['timestamp'], data[field])
+    plt.plot(data["timestamp"], data[field])
 
 
 def plot_show():
@@ -128,35 +128,42 @@ def plot_show():
 
 
 def _oml_read(filename, meas_type, fields_dtypes=()):
-    """ Read oml file
-    :measures: list of MeasureTuple """
+    """Read oml file
+    :measures: list of MeasureTuple"""
 
     # Select values
     dtypes = OML_FIELDS + list(fields_dtypes)
     names = [entry[0] for entry in dtypes]
 
     # Read values from file
-    c_meas_type = {names.index('type'): _valid_oml_f(meas_type)}
-    data = numpy.genfromtxt(filename, skip_header=OML_HEADER_LEN, names=names,
-                            dtype=dtypes, converters=c_meas_type,
-                            invalid_raise=False)
+    c_meas_type = {names.index("type"): _valid_oml_f(meas_type)}
+    data = numpy.genfromtxt(
+        filename,
+        skip_header=OML_HEADER_LEN,
+        names=names,
+        dtype=dtypes,
+        converters=c_meas_type,
+        invalid_raise=False,
+    )
 
     # Update 'timestamp' field with the cn calculated timestamp
-    for row in numpy.nditer(data, op_flags=['readwrite']):
-        timestamp = row['t_s'] + row['t_us'] / 1e6
-        row['timestamp'] = timestamp
+    for row in numpy.nditer(data, op_flags=["readwrite"]):
+        timestamp = row["t_s"] + row["t_us"] / 1e6
+        row["timestamp"] = timestamp
 
     return data
 
 
 def _valid_oml_f(meas_type):
-    """ Return a function that validates oml type """
+    """Return a function that validates oml type"""
+
     def _validate(value):
-        """ Check that 'meas_type' column matchs requested """
+        """Check that 'meas_type' column matchs requested"""
         value = int(value)
         if int(value) == OML_TYPES[meas_type]:
             return meas_type
         raise TypeError(f"OML file is not: {meas_type}")
+
     return _validate
 
 

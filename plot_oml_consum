@@ -21,4 +21,5 @@
 # knowledge of the CeCILL license and that you accept its terms.
 
 import oml_plot_tools.consum
+
 oml_plot_tools.consum.main()

@@ -19,19 +19,33 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license and that you accept its terms.
 
-""" Test the iotlabcli.experiment_parser module """
+"""Test the main parser module."""
+
+from unittest.mock import patch
 
 import pytest
-
-from mock import patch
 
 import oml_plot_tools.main as main_parser
 
 
-@pytest.mark.parametrize('entry',
-                         ['consum', 'radio', 'traj'])
+@pytest.mark.parametrize("entry", ["consum", "radio", "traj"])
 def test_main_parser(entry):
-    """ Experiment parser """
-    with patch(f'oml_plot_tools.{entry}.main') as entrypoint_func:
-        main_parser.main([entry, '-i', '123'])
-        entrypoint_func.assert_called_with(['-i', '123'])
+    """Test that main dispatches to the correct subcommand."""
+    with patch(f"oml_plot_tools.{entry}.main") as entrypoint_func:
+        main_parser.main([entry, "-i", "123"])
+        entrypoint_func.assert_called_with(["-i", "123"])
+
+
+def test_main_help(capsys):
+    """Test that 'help' command prints usage."""
+    main_parser.main(["help"])
+    captured = capsys.readouterr()
+    assert "usage" in captured.out.lower()
+
+
+def test_main_default_help(capsys):
+    """Test that no arguments defaults to help."""
+    with patch("sys.argv", ["iotlab-plot"]):
+        main_parser.main()
+    captured = capsys.readouterr()
+    assert "usage" in captured.out.lower()
